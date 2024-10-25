@@ -1,0 +1,7 @@
+starlette
+uvicorn
+pydantic
+fastapi
+dlib
+face_recognition
+numpy
