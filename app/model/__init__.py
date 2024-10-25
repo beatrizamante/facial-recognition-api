@@ -1,0 +1,1 @@
+from app.model.user_model import testFunc

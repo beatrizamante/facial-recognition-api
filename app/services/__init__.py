@@ -1,0 +1,1 @@
+from app.services.image_processing import image_processing
