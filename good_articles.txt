@@ -1,0 +1,4 @@
+
+https://github.com/ivclab/Online-Face-Recognition-and-Authentication
+
+https://pyimagesearch.com/2015/05/11/creating-a-face-detection-api-with-python-and-opencv-in-just-5-minutes/#:~:text=Creating%20a%20face%20detection%20API%20with%20Python%20and,the%20face%20detector%20into%20my%20template%20API%20

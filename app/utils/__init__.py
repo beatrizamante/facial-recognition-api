@@ -1,1 +1,1 @@
-from app.utils.helpers import encode_image
+from app.utils.helpers import resizing
