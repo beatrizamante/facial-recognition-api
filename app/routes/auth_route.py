@@ -8,14 +8,14 @@ from app.controllers.auth_controllers import AuthController
 
 
 router = APIRouter()
-auth_controller = AuthController()
+auth_controller = AuthController(db_session="")
 
-@router.post("/login")
-async def login_user(file: UploadFile = File(...)):
+@router.post("/login/{user_id}")
+async def login_user(user_id: int, file: UploadFile = File(...)):
     '''Função busca o encoding de um usuário já criado e 
     faz a autenticação de mesmo no aplicatico se os dados baterem.
     Recebe uma file_path e retorna resultado da'''
     frame = np.fromstring(await file.read(), np.uint8)
     frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-    result = auth_controller.authenticate_user(frame)
+    result = auth_controller.authenticate_user(frame, user_id)
     return result

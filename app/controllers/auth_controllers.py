@@ -14,7 +14,7 @@ class AuthController:
         self.db_session = db_session
         self.image_processing = FaceRecognitionService()
 
-    def authenticate_user(self, frame):
+    def authenticate_user(self, frame, user_id):
         '''Função responsável por autenticar o usuário caso esse tenha seu
         encoding facial identificado. Recebe uma frame da câmera e retorna
         sucesso ou falha na autenticação.'''
@@ -33,7 +33,7 @@ class AuthController:
             return True
         elif encoding_to_save:
             known_encodings.append(encoding_to_save)
-            self.user_model.add_user_enconding(encoding_to_save)
+            self.user_model.add_user_enconding(user_id, encoding_to_save)
             return {"status": "authenticated", "message": "New encoding added for accuracy"}
         else:
             raise HTTPException(status_code=401, detail="Authentication failed")

@@ -30,7 +30,11 @@ class UserModel:
     def add_user_enconding(self, user_id, encoding):
         '''Função para adicionar os encondings dentro do banco de dados. Recebe o id do usuário
         e o enconding referente ao mesmo e salva dentro da base de dados.'''
-        self.db[user_id] = encoding
-        self.save_database()
+        if user_id in self.db: 
+            self.db[user_id] = encoding
+            self.save_database()
+        else:
+            print("User doesn't exist on the database")
+            
         
         
