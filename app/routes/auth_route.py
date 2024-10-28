@@ -6,6 +6,7 @@ import numpy as np
 from cv2 import cv2
 from app.controllers.auth_controllers import AuthController
 
+
 router = APIRouter()
 auth_controller = AuthController()
 

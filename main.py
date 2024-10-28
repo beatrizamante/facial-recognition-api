@@ -1,7 +1,9 @@
 '''Entrypoint da api'''
 
 from fastapi import FastAPI
-from app.views import auth_view
+from app.routes import auth_route
 app = FastAPI()
 
-app.include_router(auth_view.router, prefix="/auth")
+MATCH_THRESHOLD = 0.6
+
+app.include_router(auth_route.router, prefix="/auth")
