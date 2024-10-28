@@ -1,7 +1,7 @@
 '''Módulo responsável por auteticar e logar o usuário'''
 
-from app.model.user_model import UserModel
-from app.services.image_processing import FaceRecognitionService
+from app.models.user_model import UserModel
+from app.services.face_recognition_service import FaceRecognitionService
 class AuthController:
     '''Classe responsável por controlar a autenticação e login do usuário.'''
     def __init__(self):

@@ -1,1 +1,1 @@
-from app.services.image_processing import FaceRecognitionService
+from app.services.face_recognition_service import FaceRecognitionService
