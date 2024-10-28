@@ -1,1 +1,1 @@
-from app.model.user_model import testFunc
+from app.model.user_model import user_new_label_registration
