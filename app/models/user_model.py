@@ -2,6 +2,7 @@
 comparar com a imagem da câmera'''
 
 from pathlib import Path
+import pickle
 
 class UserModel:
     '''Classe usada para fazer carregamento de enconding faciais dos usuários e salvar 
@@ -17,14 +18,14 @@ class UserModel:
         'rb - read binary' caso esse diretório já exista.'''
         if self.db_path.exists():
             with open(self.db_path, "rb") as f:
-                return cryptography.load(f)
+                return pickle.load(f)
         return {}
     
     def save_database(self):
         '''Função utilizada para salvar 'wb - write binary' o encoding facial do usuário dentro 
         de um caminho no banco de dados. Função sem retorno.'''
         with open(self.db_path, "wb") as f:
-            crytography.dump(self.db, f)
+            pickle.dump(self.db, f)
             
     def add_user_enconding(self, user_id, encoding):
         '''Função para adicionar os encondings dentro do banco de dados. Recebe o id do usuário
