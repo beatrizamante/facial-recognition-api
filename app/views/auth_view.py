@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import numpy as np
-import cv2
+from cv2 import cv2
 from app.controllers.auth_controllers import AuthController
 
 
