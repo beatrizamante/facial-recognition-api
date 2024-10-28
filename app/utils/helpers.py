@@ -36,5 +36,3 @@ Retorna o valor gamma e a frame'''
     else: gamma = 1.0
     
     return gamma_correction(frame, gamma)
-   
-

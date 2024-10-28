@@ -7,24 +7,11 @@ class AuthController:
     def __init__(self):
         self.user_model = UserModel()
         self.image_processing = FaceRecognitionService()
-        
-    def register_user(self, user_id, frame):
-        '''Função responsável por fazer o login do usuário. Recebe uma 
-        identificação e uma frame gravada na hora e retorna falha ou 
-        sucesso ao registrar o novo encoding no banco de dados.'''
-        
-        encoding = self.image_processing.extract_face_encoding(frame)
-        if encoding is None: 
-            return {"Success": False, "message": "No face detected"}
 
-        self.user_model.add_user_enconding(user_id, encoding)
-        return {"success": True, "message": "User registered successfully"}
-    
     def authenticate_user(self, frame):
         '''Função responsável por autenticar o usuário caso esse tenha seu 
         encoding facial identificiado. Recebe uma frame da câmera e retorna
         sucesso ou falha na autenticação.'''
-        
         unknown_encoding = self.image_processing.extract_face_encoding(frame)
         if unknown_encoding is None:
             return {"authenticated": False, "message": "No face detected"}
