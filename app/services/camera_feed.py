@@ -18,7 +18,7 @@ class CameraFeed:
         face_locations = face_recognition.face_locations(rgb_frame)
 
         for (top, right, bottom, left) in face_locations:
-            cv2.rectangle(frame, (left, top), (right, bottom), (255, 0, 0), 2)
+            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
         
         if not ret:
             raise ValueError("Could not read from camera")
