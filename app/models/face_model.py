@@ -6,7 +6,8 @@ class FaceModel:
     def extract_face_encoding(self, frame):
         '''Função para extração de encoding facial da imagem da câmera. 
         Ela recebe uma frame e retorna o encoding do primeiro rosto codificado.'''
-        encodings = face_recognition.face_encodings(frame)
+        rgb_frame = frame[:, :, ::-1]
+        encodings = face_recognition.face_encodings(rgb_frame)
         if not encodings:
             return None
         return encodings[0]
