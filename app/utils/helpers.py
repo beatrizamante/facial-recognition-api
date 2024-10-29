@@ -1,6 +1,5 @@
 '''Funções utils para auxiliar no processamento da imagem'''
-
-from cv2 import cv2
+import cv2
 import numpy as np
 
 def resizing(frame):
