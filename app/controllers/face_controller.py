@@ -14,11 +14,11 @@ class FaceController:
         while True:
             frame = self.view.get_frame() 
             encoding = self.model.extract_face_encoding(frame)
+            print("Face encoding:", encoding)
             
             if encoding is not None:  
                 print("User authenticated successfully! - Se encontrar um rosto, irá retornar sucesso")
                 json_data = self.view.format_to_json(encoding)
-                print("Face encoding:", encoding)
                 print("JSON Data:", json_data) 
                 
                 # response = requests.post(backend_url, data=json_data,
