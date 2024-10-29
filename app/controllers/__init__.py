@@ -1,1 +1,1 @@
-# from app.controllers.auth_controllers import auth_user
+from app.controllers.face_controller import FaceController

@@ -1,9 +1,9 @@
 import time
 import threading
-from app.controllers.face_recognition_service import FaceController
+from app.controllers.face_controller import FaceController
 
 def display_camera_feed(face_controller):
-    '''Function to display the camera feed in a separate thread.'''
+    '''Função que deixa a câmera aberto numa thread diferente'''
     face_controller.view.display_feed()
 
 if __name__ == "__main__":
