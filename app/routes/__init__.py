@@ -1,1 +1,0 @@
-from app.routes.auth_route import login_user

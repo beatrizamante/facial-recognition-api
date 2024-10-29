@@ -1,1 +1,1 @@
-from app.services.face_recognition_service import FaceRecognitionService
+from app.services.camera_feed import CameraFeed

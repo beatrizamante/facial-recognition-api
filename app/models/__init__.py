@@ -1,3 +1,3 @@
 '''Importa o UserModel'''
 
-from app.models.user_model import UserModel
+from app.models.face_model import FaceModel
