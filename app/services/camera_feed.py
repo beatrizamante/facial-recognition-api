@@ -14,7 +14,7 @@ class CameraFeed:
         '''Função que inicia a captura dos frames, retornando o frame atual'''
         ret, frame = self.video_capture.read()     
         self.draw_boxes(frame)
-        if not ret:
+        if not ret or frame is None:
             raise ValueError("Could not read from camera")
         return frame
     

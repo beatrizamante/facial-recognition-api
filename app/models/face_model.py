@@ -9,7 +9,9 @@ class FaceModel:
         rgb_frame = frame[:, :, ::-1]
         face_locations = face_recognition.face_locations(rgb_frame)
         if face_locations:
-            encodings = face_recognition.face_encodings(rgb_frame)
+            encodings = face_recognition.face_encodings(rgb_frame, num_jitters=2)
+            print("Face encoding:", encodings)
+            
             if not encodings:
                 return None
             return encodings[0]
