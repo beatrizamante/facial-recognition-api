@@ -1,1 +1,1 @@
-from .load import LoadData
+from .get_frame import CameraFeed

@@ -59,7 +59,7 @@ class FaceController:
                     # else:
                     #     print("Authentication failed. Trying again...")
 
-                time.sleep(0.3)
+                time.sleep(1)
                 
                 total_attempts -= 1
                 if total_attempts == 0:
