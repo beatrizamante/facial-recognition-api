@@ -16,26 +16,25 @@ class CameraFeed:
         e a localicação das faces em câmera.
         Recebe uma label como parâmetro para adicionar nos retângulos.'''
         
-        process_this_frame = True
-        
+        frame_count = 0
         while True:
             ret, frame = self.video_capture.read()
             if not ret or frame is None:
                 raise ValueError("Could not read from camera")
             
-            if process_this_frame:
+            if frame_count % 5 == 0:
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 face_locations = face_recognition.face_locations(rgb_frame)
+                yield frame, face_locations
+            else:
+                yield frame, []
             
-            process_this_frame = not process_this_frame
             self.draw_boxes(frame, face_locations, label)
             cv2.imshow("Camera Feed", frame)
         
-            yield frame, face_locations
-
+            frame_count += 1
             if cv2.waitKey(1) & 0xFF == 27:  # ESC key
                 break
-    
     
     def draw_boxes(self, frame, face_locations, user_label=""):
         '''Função desenha retângulos com o nome da pessoa quando está é

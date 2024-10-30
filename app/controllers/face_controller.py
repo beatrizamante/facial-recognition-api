@@ -18,24 +18,35 @@ class FaceController:
         até que o usuário seja autenticado.'''
         
         successful_attempts = 0
-        total_attempts = 10
+        total_attempts = 45
         try:
             for frame, face_locations in self.camera_feed.get_frame("Authenticating..."):
-                encoding = self.face_model.extract_face_encoding(frame, face_locations)
-
+                print(f"Maximum attempts: {total_attempts}")
+                total_attempts -= 1
+                
+                if face_locations:
+                    encoding = self.face_model.extract_face_encoding(frame, face_locations)
+                else: 
+                    encoding = None
+                    
                 if encoding is not None:
                     #To test mock_db - usng distance                    
                     is_match = self.face_model.calculate_face_distance(encoding, self.encoded_faces, threshold=0.5)
                     if is_match:
                         successful_attempts += 1
                         print(f"Successful attempts {successful_attempts}")
-                        
                         if successful_attempts >= 5:
                             print(f"Authenticated as {is_match}")
                             return {"message": f"User authenticated successfully as {is_match}"}
                     else:
                         print("Authentication failed, trying again...")
-                        
+                    
+                time.sleep(0.1)
+                    
+                if total_attempts == 0:
+                    print("Maximum attempts reached.")
+                    break
+                
                     #Using compare
                     # match = self.face_model.compare_faces(encoding, self.encoded_faces, tolerance=0.5)
                     #if match:
@@ -59,12 +70,7 @@ class FaceController:
                     # else:
                     #     print("Authentication failed. Trying again...")
 
-                time.sleep(0.3)
                 
-                total_attempts -= 1
-                if total_attempts == 0:
-                    print("Maximum attempts reached.")
-                    break
                 
         except Exception as e:
             print("An error occurred; ", e)
