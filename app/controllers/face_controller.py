@@ -42,7 +42,7 @@ class FaceController:
                     print("No face detected, trying again...")
                     return {"error": "Authentication failed"}
 
-                time.sleep(1)
+                time.sleep(2)
                 
         except Exception as e:
             print("An error occured; ", e)
