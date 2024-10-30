@@ -35,9 +35,6 @@ class CameraFeed:
 
             if cv2.waitKey(1) & 0xFF == 27:  # ESC key
                 break
-
-        self.video_capture.release()
-        cv2.destroyAllWindows()
         
         return frame, face_locations
     
@@ -51,9 +48,13 @@ class CameraFeed:
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, user_label, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-            
-            return frame
     
+    def __del__(self):
+        '''Libera a camera e deleta todas as janelas quando chamado.'''
+        if self.video_capture is not None:
+            self.video_capture.release()
+            cv2.destroyAllWindows()
+            self.video_capture = None
 
     def format_to_json(self, encoding):
         '''Função que torna o encoding em um objeto JSON,
