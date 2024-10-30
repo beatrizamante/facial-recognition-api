@@ -28,6 +28,7 @@ class CameraFeed:
             else:
                 yield frame, []
             
+            print(f"Calling label from get_frame: {label}")
             self.draw_boxes(frame, face_locations, label)
             cv2.imshow("Camera Feed", frame)
         

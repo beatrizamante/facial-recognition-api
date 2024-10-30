@@ -22,7 +22,7 @@ class FaceController:
         total_attempts = 100
         try:
             for frame, face_locations in self.camera_feed.get_frame(user_label):
-                print(f"User_label {user_label}")
+                print(f"User label on authenticate: {user_label}")
                 print(f"Maximum attempts: {total_attempts}")
                 total_attempts -= 1
                 
@@ -61,16 +61,15 @@ class FaceController:
                                
                     #Actual code to pull stuff from the database  
                     # json_data = self.camera_feed.format_to_json(encoding)
-                    # print("Json object:", json_data)
                     # response = requests.post(backend_url, data=json_data,
                     #                          headers={"Content-Type": "application/json"}, timeout=30)
 
                     # if response.status_code == 200:  
                     #     successful_attempts += 1
                         
-                    #     if successful_attempts >= total_success:
+                    #     if successful_attempts >= 5:
                     #         print("User authenticated successfully!")
-                    #         return response.json()
+                    #         return response.json(user_label)
                     # else:
                     #     print("Authentication failed. Trying again...")
 
