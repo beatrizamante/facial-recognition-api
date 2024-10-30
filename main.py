@@ -1,24 +1,16 @@
 import time
-import threading
 from app.controllers.face_controller import FaceController
-
-def display_camera_feed(face_controller):
-    '''Função que deixa a câmera aberto numa thread diferente'''
-    face_controller.view.display_feed()
+from app.services.camera_feed import CameraFeed
 
 if __name__ == "__main__":
     BACKEND_URL = "http://your-backend-url/authenticate"
     face_controller = FaceController()
-
-    camera_thread = threading.Thread(target=display_camera_feed, args=(face_controller,))
-    camera_thread.start()
+    camera_feed = CameraFeed() 
 
     try:
-        while True:
-            response = face_controller.authenticate_user(BACKEND_URL)
-            print("Response from backend:", response)
-            time.sleep(10)  
+        camera_feed.get_frame()
     except KeyboardInterrupt:
         print("Stopping the facial recognition API...")
+    except Exception as e:
+        print("An error occured: ", e)
 
-    camera_thread.join()
