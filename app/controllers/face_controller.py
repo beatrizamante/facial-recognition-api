@@ -5,35 +5,28 @@ from app.models.face_model import FaceModel
 class FaceController:
     '''Classe responsável pelo service de reconhecimento'''
     def __init__(self):
-        self.model = FaceModel()
-        self.view = CameraFeed()
+        self.face_model = FaceModel()
+        self.camera_feed = CameraFeed()
     
     def authenticate_user(self, backend_url):
         '''Função responsável por capturar frames e enviar encodings faciais
         até que o usuário seja autenticado.'''
         while True:
-            frame = self.view.get_frame() 
-            encoding = self.model.extract_face_encoding(frame)
+            frame, face_locations = self.camera_feed.get_frame() 
+            encoding = self.face_model.extract_face_encoding(frame, face_locations)
             print("Face encoding:", encoding)
             
             if encoding is not None:  
-                print("User authenticated successfully! - Se encontrar um rosto, irá retornar sucesso")
-                json_data = self.view.format_to_json(encoding)
-                print("JSON Data:", json_data) 
+                json_data = self.camera_feed.format_to_json(encoding)
+                response = requests.post(backend_url, data=json_data,
+                                         headers={"Content-Type": "application/json"}, timeout=30)
                 
-                # response = requests.post(backend_url, data=json_data,
-                #                          headers={"Content-Type": "application/json"}, timeout=30)
-                
-                # if response.status_code == 200:  
-                #     print("User authenticated successfully!")
-                #     # return response.json()
-                #     break 
-                # else:
-                #     print("Authentication failed. Trying again...")
+                if response.status_code == 200:  
+                    print("User authenticated successfully!")
+                    return response.json()
+                else:
+                    print("Authentication failed. Trying again...")
             else:
                 print("No face detected, trying again...")
                 return {"error": "Authentication failed"}
 
-    def __del__(self):
-        '''Função responsável por parar a captura da câmera'''
-        del self.view  

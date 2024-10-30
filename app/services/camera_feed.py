@@ -24,8 +24,7 @@ class CameraFeed:
             if process_this_frame:
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 face_locations = face_recognition.face_locations(rgb_frame)
-                face_encodings = self.face_model.extract_face_encoding(rgb_frame, face_locations)
-                print("Encodings: ", face_encodings)
+                # face_encodings = self.face_model.extract_face_encoding(rgb_frame, face_locations)
             
             process_this_frame = not process_this_frame
             self.draw_boxes(frame, face_locations)
@@ -38,6 +37,8 @@ class CameraFeed:
 
         self.video_capture.release()
         cv2.destroyAllWindows()
+        
+        return frame, face_locations
     
     
     def draw_boxes(self, frame, face_locations, user_label=""):
@@ -48,7 +49,7 @@ class CameraFeed:
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, "user_label", (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            cv2.putText(frame, user_label, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
             
             return frame
     

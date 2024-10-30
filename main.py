@@ -3,11 +3,10 @@ from app.services.camera_feed import CameraFeed
 
 if __name__ == "__main__":
     BACKEND_URL = "http://your-backend-url/authenticate"
-    face_controller = FaceController()
-    camera_feed = CameraFeed() 
+    auth_service = FaceController()
 
     try:
-        camera_feed.get_frame()
+        auth_service.authenticate_user(backend_url=BACKEND_URL)
     except KeyboardInterrupt:
         print("Stopping the facial recognition API...")
     except Exception as e:
