@@ -8,9 +8,7 @@ class FaceModel:
         Ela recebe uma frame e retorna o encoding do primeiro rosto codificado.'''
         if face_locations:
             encodings = face_recognition.face_encodings(frame, face_locations, num_jitters=2)
-            if not encodings:
-                return None
-            return encodings[0]
+            return encodings[0] if encodings else None
 
     def compare_faces(self, new_encoding, encoded_faces, tolerance=0.6):
         '''Função responsável por comparar as faces codificadas em um array com a 
@@ -25,18 +23,10 @@ class FaceModel:
                 return label
         return None
 
-    def calculate_face_distance(self, known_encodings, new_encodings):
+    def calculate_face_distance(self, stored_encode, new_encodings):
         '''Função responspavel por fazer o calculo de proximidade entre as faces
         do banco de dados com a que está sendo recebida pela programa, recebe
         um set de codificaçẽos já pré-existentes, assim como a que está 
         sendo codificada agora e a tolerância esperada entre ela e retorna o valor 
-        de comparação.'''
-        for entry in known_encodings: 
-            label = entry['label']
-            stored_encode = entry['encoding']    
-            distances = face_recognition.face_distance(stored_encode, new_encodings)
-            match_found = any(distance < 0.4 for distance in distances)
-            
-            if match_found:
-                return label
-        return None
+        de comparação.'''            
+        return face_recognition.face_distance([stored_encode], new_encodings)[0]
