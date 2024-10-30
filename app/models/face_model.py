@@ -3,15 +3,11 @@ import face_recognition
 class FaceModel:
     '''Classe responsável pelo service de reconhecimento'''
     
-    def extract_face_encoding(self, frame):
+    def extract_face_encoding(self, frame, face_locations):
         '''Função para extração de encoding facial da imagem da câmera. 
         Ela recebe uma frame e retorna o encoding do primeiro rosto codificado.'''
-        rgb_frame = frame[:, :, ::-1]
-        face_locations = face_recognition.face_locations(rgb_frame)
         if face_locations:
-            encodings = face_recognition.face_encodings(rgb_frame, num_jitters=2)
-            print("Face encoding:", encodings)
-            
+            encodings = face_recognition.face_encodings(frame, face_locations, num_jitters=2)
             if not encodings:
                 return None
             return encodings[0]

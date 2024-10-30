@@ -1,4 +1,3 @@
-import time
 from app.controllers.face_controller import FaceController
 from app.services.camera_feed import CameraFeed
 
