@@ -1,14 +1,14 @@
 '''Funções utils para auxiliar no processamento da imagem'''
+from app.models.face_model import FaceModel 
 import cv2
 import numpy as np
 
-def resizing(frame):
-    '''Essa função recebe uma imagem e reajusta seu tamanho antes de 
-ser reconhecida para diminuir o tempo de reconhecimento antes
-de receber o label correto'''
-
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-    return small_frame
+def get_label(encoding, encoded_faces):
+        '''Função callback para devolver um label para os 
+        retângulos desenhados no rosto do usuário. Recebe um label
+        e retorna ele para a outra função'''
+        user_label = FaceModel.calculate_face_distance(encoding, encoded_faces, threshold=0.5) 
+        return user_label if user_label else "Unknown"
 
 def gamma_correction(frame, gamma=1.0):
     '''Função responsável por ajustar a correção gamma da imagem

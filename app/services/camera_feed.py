@@ -4,13 +4,15 @@ import json
 import cv2
 import face_recognition
 from app.models.face_model import FaceModel
+from app.utils.helpers import get_label
 class CameraFeed:
     '''Classe de captura'''
     def __init__(self):
         self.face_model = FaceModel()
         self.video_capture = cv2.VideoCapture(0)
+        self.get_label = get_label
         
-    def get_frame(self, label):
+    def get_frame(self):
         '''Função que inicia a captura dos frames, retornando o frame atual
         e a localicação das faces em câmera.
         Recebe uma label como parâmetro para adicionar nos retângulos.'''
@@ -28,15 +30,15 @@ class CameraFeed:
             else:
                 yield frame, []
             
-            print(f"Calling label from get_frame: {label}")
-            self.draw_boxes(frame, face_locations, label)
+            # user_label = self.get_label()
+            self.draw_boxes(frame, face_locations, user_label="")
             cv2.imshow("Camera Feed", frame)
         
             frame_count += 1
             if cv2.waitKey(1) & 0xFF == 27:  # ESC key
                 break
     
-    def draw_boxes(self, frame, face_locations, user_label):
+    def draw_boxes(self, frame, face_locations, user_label=""):
         '''Função desenha retângulos com o nome da pessoa quando está é
         reconhecida pelo software. Recebe o frame e o usuário em questão e
         retorna o frame com o box.'''

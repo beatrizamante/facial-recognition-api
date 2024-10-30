@@ -3,12 +3,14 @@ import requests
 import json
 from app.services.camera_feed import CameraFeed
 from app.models.face_model import FaceModel
+from app.utils.helpers import get_label
 
 class FaceController:
     '''Classe responsável pelo service de reconhecimento'''
     def __init__(self):
         self.face_model = FaceModel()
         self.camera_feed = CameraFeed()
+        self.get_label = get_label
         
         with open("encoded_faces.json", "r") as f:
             self.encoded_faces = json.load(f)
@@ -21,9 +23,8 @@ class FaceController:
         successful_attempts = 0
         total_attempts = 100
         try:
-            for frame, face_locations in self.camera_feed.get_frame(user_label):
-                print(f"User label on authenticate: {user_label}")
-                print(f"Maximum attempts: {total_attempts}")
+            for frame, face_locations in self.camera_feed.get_frame():
+                # print(f"Maximum attempts: {total_attempts}")
                 total_attempts -= 1
                 
                 if face_locations:
@@ -34,7 +35,10 @@ class FaceController:
                 if encoding is not None:
                     #To test mock_db - usng distance                    
                     user_label = self.face_model.calculate_face_distance(encoding, self.encoded_faces, threshold=0.5)
+                    # new_label = self.get_label(encoding, self.encoded_faces)
                     if user_label:
+                        # print(f"This is the new label: {new_label}") 
+                        
                         successful_attempts += 1
                         
                         print(f"Successful attempts {successful_attempts}")
@@ -80,3 +84,6 @@ class FaceController:
         finally:
             del self.camera_feed
         return {"error": "Authentication failed"}
+    
+    
+        
