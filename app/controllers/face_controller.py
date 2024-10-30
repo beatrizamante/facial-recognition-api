@@ -17,10 +17,12 @@ class FaceController:
         '''Função responsável por capturar frames e enviar encodings faciais
         até que o usuário seja autenticado.'''
         
+        user_label = "Identfying..."
         successful_attempts = 0
-        total_attempts = 45
+        total_attempts = 100
         try:
-            for frame, face_locations in self.camera_feed.get_frame("Authenticating..."):
+            for frame, face_locations in self.camera_feed.get_frame(user_label):
+                print(f"User_label {user_label}")
                 print(f"Maximum attempts: {total_attempts}")
                 total_attempts -= 1
                 
@@ -31,13 +33,15 @@ class FaceController:
                     
                 if encoding is not None:
                     #To test mock_db - usng distance                    
-                    is_match = self.face_model.calculate_face_distance(encoding, self.encoded_faces, threshold=0.5)
-                    if is_match:
+                    user_label = self.face_model.calculate_face_distance(encoding, self.encoded_faces, threshold=0.5)
+                    if user_label:
                         successful_attempts += 1
+                        
                         print(f"Successful attempts {successful_attempts}")
+                        
                         if successful_attempts >= 5:
-                            print(f"Authenticated as {is_match}")
-                            return {"message": f"User authenticated successfully as {is_match}"}
+                            print(f"Authenticated as {user_label}")
+                            return {"message": f"User authenticated successfully as {user_label}"}
                     else:
                         print("Authentication failed, trying again...")
                     

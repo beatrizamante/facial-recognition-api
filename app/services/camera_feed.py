@@ -9,7 +9,6 @@ class CameraFeed:
     def __init__(self):
         self.face_model = FaceModel()
         self.video_capture = cv2.VideoCapture(0)
-        # self.video_capture = None
         
     def get_frame(self, label):
         '''Função que inicia a captura dos frames, retornando o frame atual
@@ -36,7 +35,7 @@ class CameraFeed:
             if cv2.waitKey(1) & 0xFF == 27:  # ESC key
                 break
     
-    def draw_boxes(self, frame, face_locations, user_label=""):
+    def draw_boxes(self, frame, face_locations, user_label):
         '''Função desenha retângulos com o nome da pessoa quando está é
         reconhecida pelo software. Recebe o frame e o usuário em questão e
         retorna o frame com o box.'''
