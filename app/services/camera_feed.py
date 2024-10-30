@@ -11,7 +11,9 @@ class CameraFeed:
         self.video_capture = None
         
     def get_frame(self):
-        '''Função que inicia a captura dos frames, retornando o frame atual'''
+        '''Função que inicia a captura dos frames, retornando o frame atual
+        e a localicação das faces em câmera'''
+        
         self.video_capture = cv2.VideoCapture(0)
         
         process_this_frame = True
@@ -24,10 +26,9 @@ class CameraFeed:
             if process_this_frame:
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 face_locations = face_recognition.face_locations(rgb_frame)
-                # face_encodings = self.face_model.extract_face_encoding(rgb_frame, face_locations)
             
-            process_this_frame = not process_this_frame
             self.draw_boxes(frame, face_locations)
+            process_this_frame = not process_this_frame
 
 
             cv2.imshow("Camera Feed", frame)
