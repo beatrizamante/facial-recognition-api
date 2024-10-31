@@ -3,14 +3,12 @@ import requests
 import json
 from app.services.camera_feed import CameraFeed
 from app.models.face_model import FaceModel
-from app.utils.helpers import get_label
 
 class FaceController:
     '''Classe responsável pelo service de reconhecimento'''
     def __init__(self):
         self.face_model = FaceModel()
         self.camera_feed = CameraFeed()
-        self.get_label = get_label
         
         with open("encoded_faces.json", "r") as f:
             self.encoded_faces = json.load(f)
@@ -21,9 +19,9 @@ class FaceController:
         
         user_label = "Identfying..."
         successful_attempts = 0
-        total_attempts = 100
+        total_attempts = 1000
         try:
-            for frame, face_locations in self.camera_feed.get_frame():
+            for frame, face_locations in self.camera_feed.get_frame(user_label):
                 # print(f"Maximum attempts: {total_attempts}")
                 total_attempts -= 1
                 
@@ -34,11 +32,9 @@ class FaceController:
                     
                 if encoding is not None:
                     #To test mock_db - usng distance                    
-                    user_label = self.face_model.calculate_face_distance(encoding, self.encoded_faces, threshold=0.5)
-                    # new_label = self.get_label(encoding, self.encoded_faces)
+                    user_label = self.face_model.get_label(encoding, self.encoded_faces)
                     if user_label:
-                        # print(f"This is the new label: {new_label}") 
-                        
+                        print(f"This is the new label: {user_label}") 
                         successful_attempts += 1
                         
                         print(f"Successful attempts {successful_attempts}")
@@ -49,7 +45,7 @@ class FaceController:
                     else:
                         print("Authentication failed, trying again...")
                     
-                time.sleep(0.1)
+                time.sleep(0.01)
                     
                 if total_attempts == 0:
                     print("Maximum attempts reached.")

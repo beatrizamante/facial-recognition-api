@@ -4,15 +4,13 @@ import json
 import cv2
 import face_recognition
 from app.models.face_model import FaceModel
-from app.utils.helpers import get_label
 class CameraFeed:
     '''Classe de captura'''
     def __init__(self):
         self.face_model = FaceModel()
         self.video_capture = cv2.VideoCapture(0)
-        self.get_label = get_label
         
-    def get_frame(self):
+    def get_frame(self, user_label):
         '''Função que inicia a captura dos frames, retornando o frame atual
         e a localicação das faces em câmera.
         Recebe uma label como parâmetro para adicionar nos retângulos.'''
@@ -23,14 +21,14 @@ class CameraFeed:
             if not ret or frame is None:
                 raise ValueError("Could not read from camera")
             
-            if frame_count % 5 == 0:
+            if frame_count % 10 == 0:
+                rgb_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 face_locations = face_recognition.face_locations(rgb_frame)
                 yield frame, face_locations
             else:
                 yield frame, []
             
-            # user_label = self.get_label()
             self.draw_boxes(frame, face_locations, user_label="")
             cv2.imshow("Camera Feed", frame)
         
