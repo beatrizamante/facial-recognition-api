@@ -8,16 +8,15 @@ class CameraFeed:
     def __init__(self):
         self.face_model = FaceModel()
         self.video_capture = cv2.VideoCapture(0)
-        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  
+        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Set width
         self.video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        self.last_label = None
-        self.frame_count = 0
         
     def get_frame(self):
         '''Função que inicia a captura dos frames, retornando o frame atual
         e a localicação das faces em câmera.
         Recebe uma label como parâmetro para adicionar nos retângulos.'''
         
+        frame_count = 0
         while True:
             ret, frame = self.video_capture.read()
             if not ret or frame is None:
@@ -29,6 +28,7 @@ class CameraFeed:
             else:
                 yield frame, []
 
+            self.face_model.draw_boxes(frame, face_locations, user_label="")
             cv2.imshow("Camera Feed", frame)
         
             frame_count += 1

@@ -2,8 +2,6 @@ import json
 import threading
 import time
 from app.services.camera_feed import CameraFeed
-from app.services.multithread_camera_feed import CameraFeedThread
-from app.models.db_connection import DbConnection
 from app.models.face_model import FaceModel
 
 class FaceController:
@@ -13,8 +11,6 @@ class FaceController:
         self.face_model = FaceModel()
         self.camera_feed = CameraFeed()
         self.user_label = None
-        # self.camera_feed = CameraFeedThread()
-        # self.db_encodes = DbConnection()
         
         #Tests with local json
         with open("encoded_faces.json", "r") as f:
@@ -57,7 +53,7 @@ class FaceController:
                         print("Authentication failed, trying again...")
                         
                 # Para comparar sem ser assincrono    
-                time.sleep(0.02)
+                time.sleep(0.01)
                     
                 if total_attempts == 0:
                     print("Maximum attempts reached, .")
