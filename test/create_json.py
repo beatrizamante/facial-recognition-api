@@ -5,6 +5,7 @@ import os
 def encode_images_with_labels(images_path):
     encodings = []
     for image_file in os.listdir(images_path):
+        
         label = image_file.split('-')[0]
         print("Label:", label)
         
@@ -25,4 +26,4 @@ def encode_images_with_labels(images_path):
     
     print("Encodings saved successfully.")
 
-encode_images_with_labels("app/test_images")
+encode_images_with_labels("/test_images")

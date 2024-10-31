@@ -22,7 +22,7 @@ class CameraFeed:
                 raise ValueError("Could not read from camera")
             
             if frame_count % 10 == 0:
-                rgb_frame = cv2.resize(rgb_frame, (0, 0), fx=0.5, fy=0.5)
+                # rgb_frame = cv2.resize(rgb_frame, (0, 0), fx=0.5, fy=0.5)
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 face_locations = face_recognition.face_locations(rgb_frame)
                 yield frame, face_locations
