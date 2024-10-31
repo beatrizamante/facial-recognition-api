@@ -11,6 +11,12 @@ class FaceModel:
         if face_locations:
             encodings = face_recognition.face_encodings(frame, face_locations, num_jitters=2)
             return encodings[0] if encodings else None
+        
+    def detect_faces(self, frame):
+        '''Função responsável por localizar faces na câmera e retornar sua localização
+        em real time. Serve para images estáticas também'''
+        face_locations = face_recognition.face_locations(frame)
+        return face_locations
 
     def compare_faces(self, new_encoding, encoded_faces, tolerance=0.5):
         '''Função responsável por comparar as faces codificadas em um array com a 
@@ -63,3 +69,11 @@ class FaceModel:
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, user_label, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            
+    def convert_to_rgb(self, frame):
+        '''Função para ajustar frames recebidas para tipo de imagem que 
+        o facial-recognition reconhece e retorna o formato correto. Recebe uma frame
+        e retorna a frame convertida para rgb.'''
+        small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+        return rgb_frame
