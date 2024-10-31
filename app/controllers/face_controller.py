@@ -22,7 +22,6 @@ class FaceController:
         total_attempts = 1000
         try:
             for frame, face_locations in self.camera_feed.get_frame(user_label):
-                # print(f"Maximum attempts: {total_attempts}")
                 total_attempts -= 1
                 
                 if face_locations:
@@ -31,7 +30,7 @@ class FaceController:
                     encoding = None
                     
                 if encoding is not None:
-                    #To test mock_db - usng distance                    
+                    #To test mock_db - using distance                    
                     user_label = self.face_model.get_label(encoding, self.encoded_faces)
                     if user_label:
                         print(f"This is the new label: {user_label}") 
@@ -50,14 +49,6 @@ class FaceController:
                 if total_attempts == 0:
                     print("Maximum attempts reached.")
                     break
-                
-                    #Using compare
-                    # match = self.face_model.compare_faces(encoding, self.encoded_faces, tolerance=0.5)
-                    #if match:
-                    #   print("Is match: ", match)  
-                    #   successful_attempts += 1
-                    #    return {"message": f"User authenticated successfully as {match}"}  
-                    #End tests
                                
                     #Actual code to pull stuff from the database  
                     # json_data = self.camera_feed.format_to_json(encoding)
