@@ -1,4 +1,5 @@
 import json
+import time
 from app.services.camera_feed import CameraFeed
 from app.models.face_model import FaceModel
 from app.models.db_connection import DbConnection
@@ -30,7 +31,7 @@ class FaceController:
         # await self.get_encoded_faces()  
         
         try:
-            for frame, face_locations in self.camera_feed.get_frame():
+            for frame, face_locations in self.camera_feed.get_frame(self.encoded_faces):
                 total_attempts -= 1
                 
                 if face_locations:
@@ -53,7 +54,7 @@ class FaceController:
                         print("Authentication failed, trying again...")
                         
                 # Para comparar sem ser assincrono    
-                # time.sleep(0.01)
+                time.sleep(0.01)
                     
                 if total_attempts == 0:
                     print("Maximum attempts reached.")
