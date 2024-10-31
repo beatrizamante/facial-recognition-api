@@ -54,7 +54,7 @@ class FaceModel:
         em uma lista'''
         return json.dumps({"encoding": encoding.tolist()})
     
-    def draw_boxes(self, frame, face_locations, user_label=""):
+    def draw_boxes(self, frame, face_locations, user_label):
         '''Função desenha retângulos com o nome da pessoa quando está é
         reconhecida pelo software. Recebe o frame e o usuário em questão e
         retorna o frame com o box.'''

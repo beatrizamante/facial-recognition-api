@@ -57,7 +57,7 @@ class FaceController:
                         print("Authentication failed, trying again...")
                         
                 # Para comparar sem ser assincrono    
-                time.sleep(0.01)
+                time.sleep(0.02)
                     
                 if total_attempts == 0:
                     print("Maximum attempts reached, .")
