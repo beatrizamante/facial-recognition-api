@@ -23,11 +23,12 @@ class CameraFeed:
                 raise ValueError("Could not read from camera")
             
             if frame_count % 15 == 0:
-                 yield self.process_frame(frame)
+                processed_frame, face_locations = self.process_frame(frame)
+                yield processed_frame, face_locations
             else:
                 yield frame, []
 
-            # self.face_model.draw_boxes(frame, face_locations, user_label)
+            self.face_model.draw_boxes(frame, face_locations, user_label="")
             cv2.imshow("Camera Feed", frame)
         
             frame_count += 1
@@ -44,6 +45,7 @@ class CameraFeed:
         
         adjusted_locations = [(int(top * 2), int(right * 2), int(bottom * 2), int(left *2))
                               for(top, right, bottom, left) in face_locations]
+        
         return frame, adjusted_locations
     
     def __del__(self):
