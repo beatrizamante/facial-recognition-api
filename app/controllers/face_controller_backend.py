@@ -9,14 +9,17 @@ class FaceControllerJson:
         self.camera_feed = CameraFeed()
     
     async def send_encodes_json_backend(self, backend_url):
-        '''Pega as frames e envia para o backend para comparação.'''
+        '''Pega as frames e envia para o backend para comparação.
+        Recebe a url do backend como pâemetro e empacota o encoding
+        facia em objeto json. Se a resposta do back for 200, autentica com 
+        sucesso. Loga depois de 5 tentativas com sucesso. Se não, levanta erro'''
 
         user_label = "Identifying..."
         successful_attempts = 0
-        total_attempts = 1000
+        total_attempts = 80
 
         try:
-            for frame, face_locations in self.camera_feed.get_frame(user_label):
+            for frame, face_locations in self.camera_feed.get_frame():
                 total_attempts -= 1
 
                 if face_locations:
@@ -32,10 +35,8 @@ class FaceControllerJson:
 
                     if response.status_code == 200:
                         response_data = response.json()
-                        user_label = response_data.get("user_id", "Unknown")
+                        user_label = response_data.get("user_id", "name")
                         successful_attempts += 1
-                        print(f"Authentication attempt successful: {user_label}")
-
                         if successful_attempts >= 5:
                             return {"message": f"User authenticated successfully as {user_label}"}
                     else:

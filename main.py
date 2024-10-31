@@ -1,3 +1,4 @@
+# from app.controllers.face_controller_client import FaceController
 from app.controllers.face_controller_client import FaceController
 
 if __name__ == "__main__":

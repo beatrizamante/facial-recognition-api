@@ -8,10 +8,10 @@ class CameraFeed:
     def __init__(self):
         self.face_model = FaceModel()
         self.video_capture = cv2.VideoCapture(0)
-        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  
+        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Set width
         self.video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         
-    def get_frame(self, encoded_faces):
+    def get_frame(self):
         '''Função que inicia a captura dos frames, retornando o frame atual
         e a localicação das faces em câmera.
         Recebe uma label como parâmetro para adicionar nos retângulos.'''
@@ -22,23 +22,8 @@ class CameraFeed:
             if not ret or frame is None:
                 raise ValueError("Could not read from camera")
             
-            if frame_count % 10 == 0:
-                small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-                rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-                face_locations = face_recognition.face_locations(rgb_frame)
-                
-                original_height, original_width = frame.shape[:2]
-                for i in range(len(face_locations)):
-                    (top, right, bottom, left) = face_locations[i]
-                    
-                    face_locations[i] = (
-                        int(top * 2),
-                        int(right *2),
-                        int(bottom * 2),
-                        int(left * 2)
-                    )
-
-                yield frame, face_locations
+            if frame_count % 15 == 0:
+                 yield self.process_frame(frame)
             else:
                 yield frame, []
 
@@ -48,6 +33,18 @@ class CameraFeed:
             frame_count += 1
             if cv2.waitKey(1) & 0xFF == 27:  # ESC key
                 break
+            
+    def process_frame(self, frame):
+        '''Função responsável por processar a frame recebida para comparação,
+        diminuindo assim o processamento. Recebe uma frame e retorna a frame 
+        processada.'''
+        small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+        face_locations = face_recognition.face_locations(rgb_frame)
+        
+        adjusted_locations = [(int(top * 2), int(right * 2), int(bottom * 2), int(left *2))
+                              for(top, right, bottom, left) in face_locations]
+        return frame, adjusted_locations
     
     def __del__(self):
         '''Libera a camera e deleta todas as janelas quando chamado.'''

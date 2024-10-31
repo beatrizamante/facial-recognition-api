@@ -42,9 +42,9 @@ class FaceModel:
         return None
     
     def get_label(self, encoding, encoded_faces):
-        '''Função callback para devolver um label para os 
-        retângulos desenhados no rosto do usuário. Recebe um label
-        e retorna ele para a outra função'''
+        '''Função responsável por extrair o label das encodings.
+        Recebe o encoding do usuario atual e os encodings para comparação
+        e retorna o label do usuário.'''
         user_label = self.calculate_face_distance(encoding, encoded_faces, threshold=0.5) 
         return user_label if user_label else "Unknown"
     
