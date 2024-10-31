@@ -1,4 +1,5 @@
 import face_recognition
+import json
 
 class FaceModel:
     '''Classe responsável pelo service de reconhecimento'''
@@ -44,3 +45,9 @@ class FaceModel:
         e retorna ele para a outra função'''
         user_label = self.calculate_face_distance(encoding, encoded_faces, threshold=0.5) 
         return user_label if user_label else "Unknown"
+    
+    def format_to_json(self, encoding):
+        '''Função que torna o encoding em um objeto JSON,
+        Recebe como parâmetro um encoding e retorna o objeto JSON
+        em uma lista'''
+        return json.dumps({"encoding": encoding.tolist()})

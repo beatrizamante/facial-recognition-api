@@ -1,16 +1,13 @@
 '''Módulo responsável por capturar frames da câmera'''
 
-import json
 import cv2
 import face_recognition
-from app.models.face_model import FaceModel
 class CameraFeed:
     '''Classe de captura'''
     def __init__(self):
-        self.face_model = FaceModel()
         self.video_capture = cv2.VideoCapture(0)
         
-    def get_frame(self, user_label):
+    def get_frame(self):
         '''Função que inicia a captura dos frames, retornando o frame atual
         e a localicação das faces em câmera.
         Recebe uma label como parâmetro para adicionar nos retângulos.'''
@@ -22,9 +19,21 @@ class CameraFeed:
                 raise ValueError("Could not read from camera")
             
             if frame_count % 10 == 0:
-                # rgb_frame = cv2.resize(rgb_frame, (0, 0), fx=0.5, fy=0.5)
-                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+                rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
                 face_locations = face_recognition.face_locations(rgb_frame)
+                
+                original_height, original_width = frame.shape[:2]
+                for i in range(len(face_locations)):
+                    (top, right, bottom, left) = face_locations[i]
+                    
+                    face_locations[i] = (
+                        int(top * 2),
+                        int(right *2),
+                        int(bottom * 2),
+                        int(left * 2)
+                    )
+                
                 yield frame, face_locations
             else:
                 yield frame, []
@@ -53,10 +62,6 @@ class CameraFeed:
             cv2.destroyAllWindows()
             self.video_capture = None
 
-    def format_to_json(self, encoding):
-        '''Função que torna o encoding em um objeto JSON,
-        Recebe como parâmetro um encoding e retorna o objeto JSON
-        em uma lista'''
-        return json.dumps({"encoding": encoding.tolist()})
+    
 
         

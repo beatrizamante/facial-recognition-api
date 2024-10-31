@@ -1,3 +1,6 @@
+# .gitignore
 encoded_faces.json
 
 /encodes_test
+
+.env
