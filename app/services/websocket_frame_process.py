@@ -1,11 +1,8 @@
 import asyncio
-from typing import List, Tuple
-
 import cv2
 from fastapi.websockets import WebSocketState
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
 from app.models.face_model import FaceModel
 from app.controllers.face_controller_backend import FaceControllerJson
 
@@ -13,6 +10,7 @@ app = FastAPI()
 face_model = FaceModel()
 face_controller = FaceControllerJson()
 cascade_classifier = cv2.CascadeClassifier()
+user_label = None
     
 async def receive(websocket: WebSocket, queue: asyncio.Queue):
     '''Essa é a função assíncrona que receberá conexões websocket
@@ -31,8 +29,7 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
     representa os 4 lados do retângulo'''
     
     successful_attempts = 0
-    total_attempts = 200
-    user_label = None
+    total_attempts = 100
 
     while total_attempts > 0:
         bytes = await queue.get()
@@ -49,18 +46,19 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
             encoding = face_model.extract_face_encoding(rgb_image, face_locations)
             
             if encoding is not None:
-                is_match, label = face_controller.compare_with_db(encoding, face_locations)
+                is_match, label = face_controller.compare_with_db(encoding)
+                user_label = label
+                print("User label: ", user_label)  
                 
                 if is_match:    
                     successful_attempts += 1
-                    user_label = label
+                    print("Successfull attempt: ", successful_attempts)
                     
                     if successful_attempts >= 5:
-                        if websocket.client_state == WebSocketState.CONNECTED:
-                            await websocket.send_json({"authenticated": True, "message": f"User authenticated as {user_label}"})
-                            return
-                        else:
-                            print("Websocket not connected.")
+                        print("Successfull attempt login.")
+                        await websocket.send_json({"authenticated": True, "message": f"User authenticated as {label}"})
+                        await websocket.close()
+                        break
                 else:
                     await websocket.send_json({"authenticated": False, "message": f"Face not recognized. Retrying..."})
             else:
@@ -68,16 +66,24 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
         else:
             await websocket.send_json({"authenticated": False, "message": f"No face detected."})
             
-        face_model.draw_boxes(img, faces, user_label if successful_attempts > 0 else None) 
+        print("Starts drawing box...........................")  
+        print("Img: ", img)
+        print("Face locations: ", face_locations)
+        print("User label: ", user_label)  
+        img_box = face_model.draw_boxes(img, face_locations, label if successful_attempts > 0 else None) 
+        print("Draws box...........................")
         
-        _, buffer = cv2.imencode('.jpg', img)
+        _, buffer = cv2.imencode('.jpg', img_box)
         frame_with_box = buffer.tobytes()
         await websocket.send_bytes(frame_with_box)
         
         total_attempts -= 1
+        print("Total attempts: ", total_attempts)
         
     if successful_attempts < 5:
         await websocket.send_json({"error": "Authentication failed after maximum attempts."})
+        await websocket.close()
+        return
         
 @app.websocket("/face-detection")
 async def face_detection(websocket: WebSocket):

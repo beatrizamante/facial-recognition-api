@@ -1,4 +1,3 @@
-import numpy as np
 from app.models.face_model import FaceModel
 
 class FaceControllerJson:
@@ -20,9 +19,7 @@ class FaceControllerJson:
         facia em objeto json. Se a resposta do back for 200, autentica com 
         sucesso. Loga depois de 5 tentativas com sucesso. Se não, levanta erro'''
         encoded_faces = self.mock_get_encoding()
-        
         label, is_match = self.face_model.calculate_face_distance(new_encoding, encoded_faces, threshold=0.5)
-        
         if is_match:
             return label, True
         else:

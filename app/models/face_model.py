@@ -2,6 +2,8 @@ import face_recognition
 import cv2
 import json
 
+import numpy as np
+
 class FaceModel:
     '''Classe responsável pelo service de reconhecimento. Para todos os items que usam
     face_recognition, o tipo de imagem que a api aceita é em fortmato rgb, então se for
@@ -43,10 +45,14 @@ class FaceModel:
         de comparação.'''            
         for entry in encoded_faces:
             label = entry['label']
-            stored_encode = entry['encoding']
+            stored_encode = np.array(entry['encoding'])
+            print("Array:", stored_encode)
+            print("Label: ", label)  
             distance = face_recognition.face_distance([stored_encode], new_encoding)[0]
+            print("Distance: ", distance)
             if distance < threshold: 
                 return label, True  
+
         return None, False
     
     def format_to_json(self, encoding):
@@ -55,7 +61,7 @@ class FaceModel:
         em uma lista'''
         return json.dumps({"encoding": encoding.tolist()})
     
-    def draw_boxes(self, frame, face_locations, user_label=""):
+    def draw_boxes(self, frame, face_locations, user_label):
         '''Função desenha retângulos com o nome da pessoa quando está é
         reconhecida pelo software. Recebe o frame e o usuário em questão e
         retorna o frame com o box.'''
