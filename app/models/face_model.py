@@ -3,7 +3,9 @@ import cv2
 import json
 
 class FaceModel:
-    '''Classe responsável pelo service de reconhecimento'''
+    '''Classe responsável pelo service de reconhecimento. Para todos os items que usam
+    face_recognition, o tipo de imagem que a api aceita é em fortmato rgb, então se for
+    usar algo que necessite do mesmo, favor usar covert_to_rgb antes.'''
     
     def extract_face_encoding(self, frame, face_locations):
         '''Função para extração de encoding facial da imagem da câmera. 
@@ -14,7 +16,8 @@ class FaceModel:
         
     def detect_faces(self, frame):
         '''Função responsável por localizar faces na câmera e retornar sua localização
-        em real time. Serve para images estáticas também'''
+        em real time. Serve para images estáticas também. Recebe uma frame e faz a localização
+        do rosto na imagem, retornando as coordenadas em vetor.'''
         face_locations = face_recognition.face_locations(frame)
         return face_locations
 
@@ -42,17 +45,9 @@ class FaceModel:
             label = entry['label']
             stored_encode = entry['encoding']
             distance = face_recognition.face_distance([stored_encode], new_encoding)[0]
-            print(f"Distance: ", distance)
             if distance < threshold: 
                 return label, True  
         return None, False
-    
-    def get_label(self, encoding, encoded_faces):
-        '''Função responsável por extrair o label das encodings.
-        Recebe o encoding do usuario atual e os encodings para comparação
-        e retorna o label do usuário.'''
-        user_label = self.calculate_face_distance(encoding, encoded_faces, threshold=0.5) 
-        return user_label if user_label else "Unknown"
     
     def format_to_json(self, encoding):
         '''Função que torna o encoding em um objeto JSON,
@@ -60,7 +55,7 @@ class FaceModel:
         em uma lista'''
         return json.dumps({"encoding": encoding.tolist()})
     
-    def draw_boxes(self, frame, face_locations, user_label):
+    def draw_boxes(self, frame, face_locations, user_label=""):
         '''Função desenha retângulos com o nome da pessoa quando está é
         reconhecida pelo software. Recebe o frame e o usuário em questão e
         retorna o frame com o box.'''
@@ -69,6 +64,7 @@ class FaceModel:
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, user_label, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        return frame
             
     def convert_to_rgb(self, frame):
         '''Função para ajustar frames recebidas para tipo de imagem que 
@@ -83,7 +79,6 @@ class FaceModel:
         da frame. Recebe uma frame pequena e recalcula seu temanho, retornando
         a box ajustada. SEMPRE PASSAR UMA FRAME PEQUENA, CHAMANDO CONCERT_TO_RGB
         ANTES E ENTÃO DETECT FACES.'''  
-        
         adjusted_locations = [(int(top * 2), int(right * 2), int(bottom * 2), int(left *2))
                               for(top, right, bottom, left) in face_locations]
         

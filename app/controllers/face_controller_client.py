@@ -10,45 +10,30 @@ class FaceController:
     def __init__(self):
         self.face_model = FaceModel()
         self.camera_feed = CameraFeed()
-        self.user_label = None
         
         #Tests with local json
         with open("encoded_faces.json", "r") as f:
             self.encoded_faces = json.load(f)
-            
-        # self.capture_thread = threading.Thread(target=self.camera_feed.capture_frame)
-        # self.capture_thread.start()
-        
-    # async def get_encoded_faces(self):
-    #     '''Recupera encodes do banco de dados e compara com o usuário em questão''' 
-    #     self.encoded_faces = await self.db_encodes.retrieve_encodings()
-    
-    # async def authenticate_user(self, backend_url):
     
     def authenticate_user_clientside(self):
         '''Função responsável por capturar frames e enviar encodings faciais
         até que o usuário seja autenticado.'''
         
-        user_label = "Identfying..."
         successful_attempts = 0
         total_attempts = 300
-        # await self.get_encoded_faces()  
         
         try:
-            # while successful_attempts < 5 and total_attempts != 0:
-            #     frame, face_locations = self.camera_feed.get_frame()
             for frame, face_locations in self.camera_feed.get_frame():
                 total_attempts -= 1 
-                if not self.user_label and face_locations:
+                if face_locations:
                     encoding = self.face_model.extract_face_encoding(frame, face_locations)   
                     if encoding is not None:
-                        label = self.face_model.get_label(encoding, self.encoded_faces)
-                        if label:
+                        label, is_match = self.face_model.calculate_face_distance(encoding, self.encoded_faces, threshold=0.5)
+                        if is_match:
                             successful_attempts += 1                        
                             if successful_attempts >= 5:
-                                self.user_label = label
-                                print(f"Authenticated with {self.user_label}")
-                                return {"message": f"User authenticated successfully as {user_label}"}
+                                print(f"Authenticated with {label}")
+                                return {"message": f"User authenticated successfully as {label}"}
                     else:   
                         print("Authentication failed, trying again...")
                         
@@ -63,8 +48,7 @@ class FaceController:
             print("An error occurred; ", e)
         finally:
             del self.camera_feed
-            # self.camera_feed.stop_camera()
-            # self.capture_thread.join()
+
     
     
         

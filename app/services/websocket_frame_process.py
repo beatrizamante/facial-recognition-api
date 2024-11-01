@@ -44,24 +44,31 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
         data = np.frombuffer(bytes, dtype=np.uint8)
         img = cv2.imdecode(data, 1)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
         faces = cascade_classifier.detectMultiScale(gray)
+        
         if len(faces) > 0:
             rgb_image = face_model.convert_to_rgb(img)
             face_locations = face_model.detect_faces(rgb_image)
+            
             encoding = face_model.extract_face_encoding(rgb_image, face_locations)
+            
             if encoding is not None:
                 is_match, user_label = face_controller.compare_with_db(encoding, face_locations)
-                if is_match:
+                if is_match:    
                     successful_attempts += 1
+                    
                     if successful_attempts >= 5:
-                        await websocket.send_json({"message": f"User authenticated as {user_label}"})
+                        await websocket.send_json({"authenticated": True, "message": f"User authenticated as {user_label}"})
+                        return
                 else:
-                    await websocket.send_json({"message": f"Face not recognized. Retrying..."})
+                    await websocket.send_json({"authenticated": False, "message": f"Face not recognized. Retrying..."})
             else:
-                await websocket.send_json({"message": f"No face encoding found in frame"})
+                await websocket.send_json({"authenticated": False, "message": f"No face encoding found in frame"})
         else:
-            await websocket.send_json({"message": f"No face detected."})
-        
+            await websocket.send_json({"authenticated": False, "message": f"No face detected."})
+            
+        face_model.draw_boxes(img, faces, user_label) 
         total_attempts -= 1
         
     if successful_attempts < 5:
@@ -74,7 +81,6 @@ async def face_detection(websocket: WebSocket):
     
     await websocket.accept()
     queue: asyncio.Queue = asyncio.Queue(maxsize=10)
-    face_model = FaceModel() 
     detect_task = asyncio.create_task(detect_and_authorize(websocket, queue, face_model, face_controller))
     try:
         while True:
