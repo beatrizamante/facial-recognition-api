@@ -1,1 +1,1 @@
-from app.services.camera_feed import CameraFeed
+from app.services.camera_feed_desktop import CameraFeed

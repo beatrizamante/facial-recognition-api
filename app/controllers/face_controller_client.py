@@ -1,7 +1,7 @@
 import json
 import threading
 import time
-from app.services.camera_feed import CameraFeed
+from app.services.camera_feed_desktop import CameraFeed
 from app.models.face_model import FaceModel
 
 class FaceController:

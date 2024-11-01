@@ -35,7 +35,7 @@ class FaceModel:
     def calculate_face_distance(self, new_encoding, encoded_faces, threshold):
         '''Função responspavel por fazer o calculo de proximidade entre as faces
         do banco de dados com a que está sendo recebida pela programa, recebe
-        um set de codificaçẽos já pré-existentes, assim como a que está 
+        um set de codificações já pré-existentes, assim como a que está 
         sendo codificada agora e a tolerância esperada entre ela e retorna o valor 
         de comparação.'''            
         for entry in encoded_faces:
@@ -44,8 +44,8 @@ class FaceModel:
             distance = face_recognition.face_distance([stored_encode], new_encoding)[0]
             print(f"Distance: ", distance)
             if distance < threshold: 
-                return label  
-        return None
+                return label, True  
+        return None, False
     
     def get_label(self, encoding, encoded_faces):
         '''Função responsável por extrair o label das encodings.

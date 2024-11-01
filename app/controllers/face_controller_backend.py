@@ -1,53 +1,38 @@
-from app.controllers.face_controller_client import FaceController
-from fastapi import FastAPI
-import requests
-import cv2
+import numpy as np
 from app.models.face_model import FaceModel
-
-app = FastAPI()
 
 class FaceControllerJson:
     '''Classe responsável pelo service de reconhecimento'''
     def __init__(self):
         self.face_model = FaceModel()
+        
+    # def load_database(self):
+    #     '''Essa função é responsável por dar load nas encodings
+    #     guardadas no banco'''
+    #     for result in database_results: 
+    #         self.known_user_labels.append(result["user_label"])
+    #         self.known_face_encodings.append(np.array(result["encoding"])) 
     
-    async def send_encodes_json_backend(self, frame):
+    def compare_with_db(self, new_encoding):
         '''Pega as frames e envia para o backend para comparação.
         Recebe a url do backend como pâemetro e empacota o encoding
         facia em objeto json. Se a resposta do back for 200, autentica com 
         sucesso. Loga depois de 5 tentativas com sucesso. Se não, levanta erro'''
-
-        face_locations = self.face_model.detect_faces(frame)
-        user_label = "Identifying..."
-        successful_attempts = 0
-        total_attempts = 80
-
-        if face_locations:
-            encoding = self.face_model.extract_face_encoding(frame, face_locations)
+        encoded_faces = self.mock_get_encoding()
+        
+        label, is_match = self.face_model.calculate_face_distance(new_encoding, encoded_faces, threshold=0.5)
+        
+        if is_match:
+            return label, True
         else:
-            encoding = None  
-        if encoding is not None:
-            _, buffer = cv2.imencode('.jpg', frame)
-            json_data = {"image": buffer.tobytes()}  
-            response = requests.post(f"{backend_url}/encode/", files={"image": json_data})   
-            if response.status_code == 200:
-                response_data = response.json()
-                user_label = response_data.get("encoding", "name")
-                successful_attempts += 1
-                if successful_attempts >= 5:
-                    return {"message": f"User authenticated successfully as {user_label}"}
-            else:
-                print("Authentication failed, trying again...") 
-        if total_attempts == 0:
-            print("Maximum attempts reached.")
-        return {"error": "Authentication failed"}
-
-@app.post("/authenticate/")
-async def authenticate(backend_url: str):
-    controller = FaceController()
-    result = await controller.authenticate_user(backend_url)
-    return result
-
-
+            return "Unknown", False
+            
+                    
+    def mock_get_encoding(self):
+        '''Função mock para testar'''
+        return [
+            {"label" : "Beatriz", "encoding": [-0.055231723934412, 0.025637594982981682, 0.05479902774095535, -0.04092961549758911, -0.1036752313375473, -0.04669944941997528, -0.01028277724981308, -0.14264018833637238, 0.17354820668697357, -0.11370056867599487, 0.18085436522960663, 0.055416420102119446, -0.2115492820739746, -0.03516019135713577, 0.008162720128893852, 0.1016002669930458, -0.10899574309587479, -0.10647989064455032, -0.012361859902739525, -0.08109428733587265, -0.02608323283493519, 0.01829829066991806, 0.09666119515895844, 0.11405966430902481, -0.13099253177642822, -0.31465399265289307, -0.08363980054855347, -0.03862437978386879, -0.032134585082530975, -0.04606233164668083, 0.043352607637643814, 0.14564043283462524, -0.16520972549915314, 0.03284164518117905, 0.03426281362771988, 0.09020154923200607, -0.0650724396109581, -0.040779463946819305, 0.21841248869895935, 0.05391915142536163, -0.23300553858280182, -0.03040670044720173, -0.006375844590365887, 0.3045802414417267, 0.17468024790287018, 0.0067896004766225815, 0.040503405034542084, -0.08663887530565262, 0.1876976191997528, -0.2958245873451233, 0.058835141360759735, 0.13717631995677948, 0.032337360084056854, -0.008443883620202541, -0.0002600867301225662, -0.1456282138824463, 0.012186194770038128, 0.11496812105178833, -0.19222120940685272, 0.03959604725241661, 0.019802730530500412, -0.18911853432655334, 0.011400495655834675, -0.07689778506755829, 0.26013949513435364, 0.12656882405281067, -0.17053399980068207, -0.06034379452466965, 0.11255081743001938, -0.20179975032806396, -0.030453523620963097, 0.10488447546958923, -0.11908921599388123, -0.19545142352581024, -0.3421812057495117, 0.0443551242351532, 0.43205612897872925, 0.10502026975154877, -0.09560897201299667, 0.004437564872205257, -0.11620453000068665, 0.025231871753931046, 0.018878931179642677, 0.20289382338523865, -0.07005229592323303, -0.022950656712055206, -0.06470158696174622, 0.006131960079073906, 0.24121138453483582, -0.0449460931122303, -0.06738007068634033, 0.26122620701789856, 0.014235958456993103, 0.07376295328140259, -0.009196367114782333, 0.07259585708379745, -0.10504613071680069, -0.04215732961893082, -0.0975128784775734, 0.028002016246318817, -0.08027167618274689, -0.07945746183395386, 0.036322250962257385, 0.10637179762125015, -0.27426066994667053, 0.19485753774642944, -0.013991781510412693, -0.058594994246959686, 0.05016639456152916, -0.006657610647380352, -0.06984594464302063, -0.11350936442613602, 0.08482041209936142, -0.34066012501716614, 0.16502976417541504, 0.1797935664653778, 0.09680911153554916, 0.23106350004673004, -0.008882520720362663, 0.07991131395101547, -0.0473078228533268, -0.04978880286216736, -0.055976755917072296, -0.02279099076986313, 0.07232119143009186, -0.023513715714216232, 0.02749411202967167, -0.0010752659291028976]}
+            
+        ]
 
         
