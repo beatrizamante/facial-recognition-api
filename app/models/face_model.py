@@ -60,17 +60,6 @@ class FaceModel:
         Recebe como parâmetro um encoding e retorna o objeto JSON
         em uma lista'''
         return json.dumps({"encoding": encoding.tolist()})
-    
-    def draw_boxes(self, frame, face_locations, user_label):
-        '''Função desenha retângulos com o nome da pessoa quando está é
-        reconhecida pelo software. Recebe o frame e o usuário em questão e
-        retorna o frame com o box.'''
-        for (top, right, bottom, left) in face_locations:
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, user_label, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-        return frame
             
     def convert_to_rgb(self, frame):
         '''Função para ajustar frames recebidas para tipo de imagem que 

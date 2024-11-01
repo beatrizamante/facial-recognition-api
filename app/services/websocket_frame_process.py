@@ -1,16 +1,25 @@
 import asyncio
+from typing import List, Tuple
 import cv2
 from fastapi.websockets import WebSocketState
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from app.models.face_model import FaceModel
 from app.controllers.face_controller_backend import FaceControllerJson
+from pydantic import BaseModel
 
 app = FastAPI()
 face_model = FaceModel()
 face_controller = FaceControllerJson()
 cascade_classifier = cv2.CascadeClassifier()
 user_label = None
+
+class Faces(BaseModel):
+    """ This is a pydantic model to define the structure of the streaming data 
+    that we will be sending the the cv2 Classifier to make predictions
+    It expects a List of a Tuple of 4 integers
+    """
+    faces: List[Tuple[int, int, int, int]]
     
 async def receive(websocket: WebSocket, queue: asyncio.Queue):
     '''Essa é a função assíncrona que receberá conexões websocket
@@ -65,17 +74,12 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
                 await websocket.send_json({"authenticated": False, "message": f"No face encoding found in frame"})
         else:
             await websocket.send_json({"authenticated": False, "message": f"No face detected."})
-            
-        print("Starts drawing box...........................")  
-        print("Img: ", img)
-        print("Face locations: ", face_locations)
-        print("User label: ", user_label)  
-        img_box = face_model.draw_boxes(img, face_locations, label if successful_attempts > 0 else None) 
-        print("Draws box...........................")
-        
-        _, buffer = cv2.imencode('.jpg', img_box)
-        frame_with_box = buffer.tobytes()
-        await websocket.send_bytes(frame_with_box)
+
+        if len(faces) > 0:
+            faces_output = Faces(faces=faces.tolist())
+        else:
+            faces_output = Faces(faces=[])
+        await websocket.send_json(faces_output.model_dump())
         
         total_attempts -= 1
         print("Total attempts: ", total_attempts)
