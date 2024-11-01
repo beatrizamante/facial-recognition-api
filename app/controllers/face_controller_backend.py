@@ -5,6 +5,7 @@ class FaceControllerJson:
     '''Classe responsável pelo service de reconhecimento'''
     def __init__(self):
         self.face_model = FaceModel()
+        #Iniciar queries do banco já carregadas
         
     # def load_database(self):
     #     '''Essa função é responsável por dar load nas encodings

@@ -77,3 +77,16 @@ class FaceModel:
         small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
         return rgb_frame
+
+    def adjust_boundaries(self, small_frame, face_locations):
+        '''Função para ajustar o tamanho do retângulo após o recalculo
+        da frame. Recebe uma frame pequena e recalcula seu temanho, retornando
+        a box ajustada. SEMPRE PASSAR UMA FRAME PEQUENA, CHAMANDO CONCERT_TO_RGB
+        ANTES E ENTÃO DETECT FACES.'''  
+        
+        adjusted_locations = [(int(top * 2), int(right * 2), int(bottom * 2), int(left *2))
+                              for(top, right, bottom, left) in face_locations]
+        
+        return adjusted_locations
+        
+        

@@ -39,9 +39,8 @@ class CameraFeed:
         '''Função responsável por processar a frame recebida para comparação,
         diminuindo assim o processamento. Recebe uma frame e retorna a frame 
         processada.'''
-        small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-        rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-        face_locations = face_recognition.face_locations(rgb_frame)
+        rgb_frame = self.face_model.convert_to_rgb(frame)
+        face_locations = self.face_model.detect_faces(rgb_frame)
         
         adjusted_locations = [(int(top * 2), int(right * 2), int(bottom * 2), int(left *2))
                               for(top, right, bottom, left) in face_locations]
