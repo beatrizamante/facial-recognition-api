@@ -20,6 +20,8 @@ class FaceControllerJson:
         sucesso. Loga depois de 5 tentativas com sucesso. Se não, levanta erro'''
         encoded_faces = self.mock_get_encoding()
         label, is_match = self.face_model.calculate_face_distance(new_encoding, encoded_faces, threshold=0.5)
+        print("Is match?", is_match)
+        print("Label of compare: ", label)
         if is_match:
             return label, True
         else:

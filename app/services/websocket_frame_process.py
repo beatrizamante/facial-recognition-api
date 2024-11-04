@@ -15,12 +15,17 @@ cascade_classifier = cv2.CascadeClassifier()
 user_label = None
 
 class Faces(BaseModel):
-    """ This is a pydantic model to define the structure of the streaming data 
-    that we will be sending the the cv2 Classifier to make predictions
-    It expects a List of a Tuple of 4 integers
-    """
     faces: List[Tuple[int, int, int, int]]
     
+    
+    
+# class Faces(BaseModel):
+#     """ This is a pydantic model to define the structure of the streaming data 
+#     that we will be sending the the cv2 Classifier to make predictions
+#     It expects a List of a Tuple of 4 integers
+#     """
+#     faces: List[FaceDetection]
+
 async def receive(websocket: WebSocket, queue: asyncio.Queue):
     '''Essa é a função assíncrona que receberá conexões websocket
     do applicativo/página web'''
@@ -55,11 +60,15 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
             encoding = face_model.extract_face_encoding(rgb_image, face_locations)
             
             if encoding is not None:
-                is_match, label = face_controller.compare_with_db(encoding)
+                label, is_match = face_controller.compare_with_db(encoding)
+                print("Is match on backend: ", is_match)  
                 user_label = label
                 print("User label: ", user_label)  
                 
                 if is_match:    
+                    print("Is match of websocket?", is_match)
+                    print("Is label of websocket?", label)
+                    
                     successful_attempts += 1
                     print("Successfull attempt: ", successful_attempts)
                     
@@ -75,11 +84,15 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
         else:
             await websocket.send_json({"authenticated": False, "message": f"No face detected."})
 
+        # faces_output = Faces(faces=faces.tolist(), label=user_label if user_label else "Unknown")
+        # await websocket.send_json(faces_output.model_dump())
+        
+        # #Este tá funfando
         if len(faces) > 0:
             faces_output = Faces(faces=faces.tolist())
         else:
             faces_output = Faces(faces=[])
-        await websocket.send_json(faces_output.model_dump())
+        await websocket.send_json(faces_output.dict())
         
         total_attempts -= 1
         print("Total attempts: ", total_attempts)

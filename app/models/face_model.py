@@ -31,7 +31,7 @@ class FaceModel:
         for entry in encoded_faces: 
             label = entry['label']
             stored_encode = entry['encoding'] 
-            print(f"Label: {label}, enconding: {stored_encode}")       
+            print(f"Label face_model: {label}, enconding face_model: {stored_encode}")       
             matches = face_recognition.compare_faces([stored_encode], new_encoding, tolerance)
             if matches[0]:
                 return label
@@ -46,13 +46,10 @@ class FaceModel:
         for entry in encoded_faces:
             label = entry['label']
             stored_encode = np.array(entry['encoding'])
-            print("Array:", stored_encode)
-            print("Label: ", label)  
             distance = face_recognition.face_distance([stored_encode], new_encoding)[0]
             print("Distance: ", distance)
             if distance < threshold: 
                 return label, True  
-
         return None, False
     
     def format_to_json(self, encoding):
