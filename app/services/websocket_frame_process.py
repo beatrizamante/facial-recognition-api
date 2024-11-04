@@ -5,26 +5,28 @@ from fastapi.websockets import WebSocketState
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from app.models.face_model import FaceModel
-from app.controllers.auth_controller import FaceControllerJson
+from app.controllers.face_controller_backend import FaceControllerJson
 from pydantic import BaseModel
 
 app = FastAPI()
 face_model = FaceModel()
 face_controller = FaceControllerJson()
 cascade_classifier = cv2.CascadeClassifier()
+user_label = None
 
-class Faces(BaseModel):
-    '''Essa classe cria um tipo de lista com um tuple de 4 inteiros
-    para representar cada um dos lados do retângulo assim como pedido no
-    pydantic.'''
-    faces: List[Tuple[int, int, int, int]]
-    
-# class Faces(BaseModel):
-#     """ This is a pydantic model to define the structure of the streaming data 
-#     that we will be sending the the cv2 Classifier to make predictions
-#     It expects a List of a Tuple of 4 integers
-#     """
-#     faces: List[FaceDetection]
+class Face(BaseModel):
+    '''Modelo base - tipagem do que é esperado para desenhar os quadrados no front.'''
+    x: int
+    y: int
+    width: int
+    height: int
+    label: str = "Desconhecido"  
+
+class FacesList(BaseModel):
+    '''Os modelos de desenho são enviados como objetos JSON em lista, então é necessário
+    torná-los em uma lista aqui.'''
+    facesList: List[Face] 
+
 
 async def receive(websocket: WebSocket, queue: asyncio.Queue):
     '''Essa é a função assíncrona que receberá conexões websocket
@@ -61,9 +63,10 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
             encoding = face_model.extract_face_encoding(rgb_image, face_locations)
             
             if encoding is not None:
-                label, is_match = await face_controller.compare_with_db(encoding)
+                label, is_match = face_controller.compare_with_db(encoding)
                 
                 if is_match:    
+                    user_label = label
                     successful_attempts += 1
                     print("Successfull attempt: ", successful_attempts)
                     
@@ -79,13 +82,19 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
         else:
             await websocket.send_json({"authenticated": False, "message": f"Nenhum rosto detectado;"})
 
-        # #Este tá funfando
+        #Still under tests        
+        faces_output = []
+        print("Are there faces?", faces)
         if len(faces) > 0:
-            faces_output = Faces(faces=faces.tolist())
+            for (x, y, w, h) in faces: 
+                face_instance = Face(x=x, y=y, width=w, height=h, label=user_label)
+                faces_output.append(face_instance)
+            faces_list = FacesList(facesList=faces_output)
         else:
-            faces_output = Faces(faces=[])
-        await websocket.send_json({"faces":faces_output.model_dump(), "label": label})
-        #Envia um object json com as coordenadas do box facial
+            faces_list = FacesList(facesList=[])
+
+        await websocket.send_json(faces_list.model_dump())
+        #But supposedly working
         
         total_attempts -= 1
         print("Total attempts: ", total_attempts)

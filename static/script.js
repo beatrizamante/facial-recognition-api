@@ -6,13 +6,29 @@ const drawFaceRectangles = (video, canvas, faces) => {
   ctx.width = video.videoWidth;
   ctx.height = video.videoHeight;
 
-  ctx.beginPath();
   ctx.clearRect(0, 0, ctx.width, ctx.height);
-  for (const [x, y, width, height] of faces.faces) {
-    ctx.strokeStyle = "#49fb35";
+  
+  if (!faces.facesList || faces.facesList.length === 0) {
+    return;    
+  }
+  ctx.beginPath();
+
+  for (const face of faces.facesList) { 
+    const { x, y, width, height, label } = face; 
+    ctx.strokeStyle = "#005D54";
+    ctx.lineWidth = 4
     ctx.beginPath();
     ctx.rect(x, y, width, height);
     ctx.stroke();
+
+    const labelHeight = 20; 
+    ctx.fillStyle = "#005D54"; 
+    ctx.fillRect(x, y + height, width, labelHeight);
+
+    ctx.fillStyle = "#FFFFFF"; 
+    ctx.font = "16px Serif"; 
+    ctx.textBaseline = "top";
+    ctx.fillText(label, x + 5, y + height + 2); 
   }
 };
 
