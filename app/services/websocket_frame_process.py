@@ -5,19 +5,19 @@ from fastapi.websockets import WebSocketState
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from app.models.face_model import FaceModel
-from app.controllers.face_controller_backend import FaceControllerJson
+from app.controllers.auth_controller import FaceControllerJson
 from pydantic import BaseModel
 
 app = FastAPI()
 face_model = FaceModel()
 face_controller = FaceControllerJson()
 cascade_classifier = cv2.CascadeClassifier()
-user_label = None
 
 class Faces(BaseModel):
+    '''Essa classe cria um tipo de lista com um tuple de 4 inteiros
+    para representar cada um dos lados do retângulo assim como pedido no
+    pydantic.'''
     faces: List[Tuple[int, int, int, int]]
-    
-    
     
 # class Faces(BaseModel):
 #     """ This is a pydantic model to define the structure of the streaming data 
@@ -40,7 +40,8 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
     classificador, que então percorre a informação para detectar a 
     presença de um rosto humano, and então retorna a localização da 
     face numa stream de câmera contínua, já que a lista de 4 tuples 
-    representa os 4 lados do retângulo'''
+    representa os 4 lados do retângulo e autorizando caso o usuário
+    exista na base de dados.'''
     
     successful_attempts = 0
     total_attempts = 100
@@ -56,43 +57,35 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
         if len(faces) > 0:
             rgb_image = face_model.convert_to_rgb(img)
             face_locations = face_model.detect_faces(rgb_image)
-            
+          
             encoding = face_model.extract_face_encoding(rgb_image, face_locations)
             
             if encoding is not None:
-                label, is_match = face_controller.compare_with_db(encoding)
-                print("Is match on backend: ", is_match)  
-                user_label = label
-                print("User label: ", user_label)  
+                label, is_match = await face_controller.compare_with_db(encoding)
                 
                 if is_match:    
-                    print("Is match of websocket?", is_match)
-                    print("Is label of websocket?", label)
-                    
                     successful_attempts += 1
                     print("Successfull attempt: ", successful_attempts)
                     
                     if successful_attempts >= 5:
                         print("Successfull attempt login.")
-                        await websocket.send_json({"authenticated": True, "message": f"User authenticated as {label}"})
+                        await websocket.send_json({"authenticated": True, "message": f"Usuário autenticado como {label}"})
                         await websocket.close()
                         break
                 else:
-                    await websocket.send_json({"authenticated": False, "message": f"Face not recognized. Retrying..."})
+                    await websocket.send_json({"authenticated": False, "message": f"Rosto não reconhecido no banco, tentando novamente..."})
             else:
-                await websocket.send_json({"authenticated": False, "message": f"No face encoding found in frame"})
+                await websocket.send_json({"authenticated": False, "message": f"Nenhum encoding encontrado na imagem."})
         else:
-            await websocket.send_json({"authenticated": False, "message": f"No face detected."})
+            await websocket.send_json({"authenticated": False, "message": f"Nenhum rosto detectado;"})
 
-        # faces_output = Faces(faces=faces.tolist(), label=user_label if user_label else "Unknown")
-        # await websocket.send_json(faces_output.model_dump())
-        
         # #Este tá funfando
         if len(faces) > 0:
             faces_output = Faces(faces=faces.tolist())
         else:
             faces_output = Faces(faces=[])
-        await websocket.send_json(faces_output.dict())
+        await websocket.send_json({"faces":faces_output.model_dump(), "label": label})
+        #Envia um object json com as coordenadas do box facial
         
         total_attempts -= 1
         print("Total attempts: ", total_attempts)
@@ -104,9 +97,7 @@ async def detect_and_authorize(websocket: WebSocket, queue: asyncio.Queue):
         
 @app.websocket("/face-detection")
 async def face_detection(websocket: WebSocket):
-    '''Esse é o endpoint que estará enviando requests
-    do frontend'''
-    
+    '''Esse é o endpoint que estará enviando requests do frontend para stream de video.'''
     await websocket.accept()
     queue: asyncio.Queue = asyncio.Queue(maxsize=10)
     detect_task = asyncio.create_task(detect_and_authorize(websocket, queue))

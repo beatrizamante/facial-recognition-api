@@ -1,29 +1,31 @@
-from hdbcli import dbapi
+import psycopg2
 from dotenv import load_dotenv
 import os
-import json
+import ast
 
 load_dotenv()
 
 class DbConnection:
-    def __init__(self):
-        self.connection = dbapi.connect(
-            address=os.getenv('DB_ADDRESS'),
-            port=os.getenv('DB_PORT'),
+    '''Função responsável por criar conexão com o banco de dados
+    para retorno de informações.'''
+    
+    def __init__(self): 
+        self.connection = psycopg2.connect(
             user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD')
-        )
-
-    async def retrieve_encodings(self):
-        '''Função para pegar os encodings do banco e retorná-los.'''
+            password=os.getenv('DB_PASSWORD'),
+            host=os.getenv('DB_HOST'),
+            port=os.getenv('DB_PORT'),
+            database=os.getenv('DB_DATABASE')
+            )    
+    
+    async def retrieve_encoded_faces(self):
+        '''Função responsável por retornar todos os encodes facias dos usuários
+        que estão salvos no banco.'''
         encodings = []
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT user_id, encoding FROM Encodings")
-            for user_id, encoding_blob in cursor.fetchall():
-                encoding = json.loads(encoding_blob) 
-                encodings.append({"user_id": user_id, "encoding": encoding})
-            cursor.close()
-        except Exception as e:
-            print("Error retrieving encodings:", e)
+        cur = self.connection.cursor()
+        cur.execute('SELECT pes."nomeClassificador", pes."hashclassificador" FROM app_classificacao_dev.pes_classificador as pes  WHERE pes."idClassificador" = 1')
+        records = cur.fetchall()
+        encodings = [{"label": record[0], "encoding": ast.literal_eval(record[1])} for record in records]
         return encodings
+
+        
