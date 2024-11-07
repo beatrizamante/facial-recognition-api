@@ -26,14 +26,14 @@ const drawFaceRectangles = (video, canvas, faces) => {
     ctx.fillRect(x, y + height, width, labelHeight);
 
     ctx.fillStyle = "#FFFFFF"; 
-    ctx.font = "16px Serif"; 
+    ctx.font = "16px Sans"; 
     ctx.textBaseline = "top";
     ctx.fillText(label, x + 5, y + height + 2); 
   }
 };
 
 const startFaceDetection = (video, canvas, deviceId) => {
-  const socket = new WebSocket('ws://localhost:8000/face-detection');
+  const socket = new WebSocket('wss://172.16.3.21:8000/face-detection');
   let intervalId;
 
   // Connection opened
