@@ -1,3 +1,4 @@
+import pickle
 import face_recognition
 import cv2
 import json
@@ -30,26 +31,27 @@ class FaceModel:
             encodings = face_recognition.face_encodings(frame, face_locations, num_jitters=2)
             return encodings[0] if encodings else None
         
-    def compare_faces(self, new_encoding, encoded_faces, tolerance=0.5):
-        '''Função responsável por comparar as faces codificadas em um array com a 
-        recebida pelo frame. Recebe um ndarray de encodes, assim como a frame codificada
-        atual e também a tolerância base (learning rate) para comparação, retorna
-        o True se encotrar um match, ou falso se não encontrar. NO MOMENTO NÃO
-        ESTÁ SENDO USADA.'''
-        for entry in encoded_faces: 
-            label = entry['label']
-            stored_encode = entry['encoding'] 
-            matches = face_recognition.compare_faces([stored_encode], new_encoding, tolerance)
-            if matches[0]:
-                return label
-        return None
+    # def compare_faces(self, new_encoding, encoded_faces, tolerance=0.5):
+    #     '''Função responsável por comparar as faces codificadas em um array com a 
+    #     recebida pelo frame. Recebe um ndarray de encodes, assim como a frame codificada
+    #     atual e também a tolerância base (learning rate) para comparação, retorna
+    #     o True se encotrar um match, ou falso se não encontrar. NO MOMENTO NÃO
+    #     ESTÁ SENDO USADA.'''
+    #     for entry in encoded_faces: 
+    #         label = entry['label']
+    #         stored_encode = entry['encoding'] 
+    #         matches = face_recognition.compare_faces([stored_encode], new_encoding, tolerance)
+    #         if matches[0]:
+    #             return label
+    #     return None
 
     def calculate_face_distance(self, new_encoding, encoded_faces, threshold):
         '''Função responspavel por fazer o calculo de proximidade entre as faces
         do banco de dados com a que está sendo recebida pela programa, recebe
         um set de codificações já pré-existentes, assim como a que está 
-        sendo codificada agora e a tolerância esperada entre ela e retorna o valor 
-        de comparação.'''            
+        sendo codificada agora e a tolerância esperada entre ela e retorna 
+        o label da pessoa do banco e se essa bate com o valor no banco com 
+        um boolean.'''            
         for entry in encoded_faces:
             label = entry['label']
             stored_encode = np.array(entry['encoding'])
@@ -58,13 +60,5 @@ class FaceModel:
                 return label, True  
         return None, False
     
-    def format_to_json(self, encoding):
-        '''Função que torna o encoding em um objeto JSON,
-        Recebe como parâmetro um encoding e retorna o objeto JSON
-        em uma lista'''
-        return json.dumps({"encoding": encoding.tolist()})
-            
 
-
-        
         

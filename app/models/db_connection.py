@@ -1,7 +1,7 @@
 import psycopg2
 from dotenv import load_dotenv
 import os
-import ast
+import pickle
 
 load_dotenv()
 
@@ -21,11 +21,25 @@ class DbConnection:
     async def retrieve_encoded_faces(self):
         '''Função responsável por retornar todos os encodes facias dos usuários
         que estão salvos no banco.'''
+        
         encodings = []
         cur = self.connection.cursor()
-        cur.execute('SELECT pes."nomeClassificador", pes."hashclassificador" FROM app_classificacao_dev.pes_classificador as pes  WHERE pes."idClassificador" = 1')
+        cur.execute('SELECT "nome", "hash" FROM operacional.conf_usuario')
         records = cur.fetchall()
-        encodings = [{"label": record[0], "encoding": ast.literal_eval(record[1])} for record in records]
+        
+        for record in records:
+            label = record[0]  
+            binary_hash = record[1] 
+
+            try:
+                encoding = pickle.loads(binary_hash)  
+            except (pickle.UnpicklingError, TypeError) as e:
+                print(f"Error decoding hash for {label}: {e}")
+                continue
+
+            encodings.append({"label": label, "encoding": encoding})
+        
+        print("This is the database encoding_____", encodings)
         return encodings
 
         
