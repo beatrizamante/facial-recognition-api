@@ -45,20 +45,33 @@ class FaceModel:
     #             return label
     #     return None
 
+
     def calculate_face_distance(self, new_encoding, encoded_faces, threshold):
         '''Função responspavel por fazer o calculo de proximidade entre as faces
         do banco de dados com a que está sendo recebida pela programa, recebe
         um set de codificações já pré-existentes, assim como a que está 
         sendo codificada agora e a tolerância esperada entre ela e retorna 
         o label da pessoa do banco e se essa bate com o valor no banco com 
-        um boolean.'''            
+        um boolean.'''  
         for entry in encoded_faces:
             label = entry['label']
-            stored_encode = np.array(entry['encoding'])
-            distance = face_recognition.face_distance([stored_encode], new_encoding)[0]
-            if distance < threshold: 
-                return label, True  
-        return None, False
+            mail = entry['mail']
+            stored_encode = [np.array(encoding) for encoding in entry['encoding']]
+            
+            print(f"Two hashes___________________________{stored_encode}")
+            
+            distances = face_recognition.face_distance(stored_encode, new_encoding)
+            
+            print(f"Distances____________________{distances}")
+            print(f"Threshold____________________{threshold}")
+            
+            if distances[0] < threshold and distances[1] < threshold:
+                print("Enters if_______________________")
+                
+                print(f"Both distances are a match for {label}, {mail}")
+                return label, mail, True
+              
+        return None, None, False
     
 
         
