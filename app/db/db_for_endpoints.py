@@ -13,10 +13,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 class Usuario(Base):
+    '''Classe responsável por fazer conexão entre sqlalchemy e banco de dados.'''
     __tablename__ = 'conf_usuario'
     __table_args__ = {'schema': 'operacional'}
 
-    idUsuario = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     nome = Column(String(100), nullable=False)
     departamento = Column(String(100))
     matricula = Column(String, nullable=False)
@@ -27,5 +28,6 @@ class Usuario(Base):
     usuarioCadastro=Column(String(100))
     usuarioAlteracao=Column(String(100))
     hash = Column(LargeBinary)  
+    hash1 = Column(LargeBinary)  
 
 Base.metadata.create_all(bind=engine)

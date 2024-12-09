@@ -40,7 +40,7 @@ class DbConnection:
                     except (pickle.UnpicklingError, TypeError) as e:
                         print(f"Error decoding hash for {label}: {e}")
             if encoding_list:
-                encodings.append({"label": label, "mail": mail, "encoding": encoding_list})      
+                encodings.append({"label": label, "mail": mail, "encoding": encoding_list})  
         return encodings
     
             

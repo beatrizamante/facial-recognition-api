@@ -2,7 +2,7 @@
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from pytest import Session
-from app.models.db_get_table import Usuario
+from app.db.db_for_endpoints import Usuario
 from app.services.auth_services import decode_token
 from app.utils.db_get import get_db
 

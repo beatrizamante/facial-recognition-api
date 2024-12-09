@@ -30,12 +30,10 @@ def decode_token(auth_token: str) -> str:
     Retorna: 
         A identificação do usuário impressa no token.'''
     if not auth_token:
-        return None
-        # raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token não encontrado")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token não encontrado")
     try:
         decoded_token = base64.b64decode(auth_token).decode('utf-8')   
         
-        print(f"Payload______________________{decoded_token}")
         return decoded_token
     
     except Exception as e:

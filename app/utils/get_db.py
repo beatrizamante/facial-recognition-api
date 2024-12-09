@@ -1,4 +1,4 @@
-from app.models.db_get_table import SessionLocal
+from app.db.db_for_endpoints import SessionLocal
 
 def get_db():
     db = SessionLocal()

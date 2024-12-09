@@ -1,7 +1,13 @@
-starlette
 uvicorn[standard]
+opencv-python 
+opencv-python-headless
+face_recognition
+starlette
 pydantic
 fastapi
-dlib
-face_recognition
-numpy
+pytest
+python-multipart
+python-dotenv
+psycopg2-binary
+sqlalchemy
+olefile

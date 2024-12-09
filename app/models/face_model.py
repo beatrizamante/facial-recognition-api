@@ -1,12 +1,10 @@
-import pickle
 import face_recognition
 import cv2
-import json
 import numpy as np
 
 class FaceModel:
     '''Classe responsável pelo service de reconhecimento. Para todos os items que usam
-    face_recognition, o tipo de imagem que a api aceita é em fortmato rgb, então se for
+    face_recognition, o tipo de imagem que a api aceita é em formato rgb, então se for
     usar algo que necessite do mesmo, favor usar covert_to_rgb antes.'''
     
     def convert_to_rgb(self, frame):
@@ -20,7 +18,7 @@ class FaceModel:
     def detect_faces(self, frame):
         '''Função responsável por localizar faces na câmera e retornar sua localização
         em real time. Serve para images estáticas também. Recebe uma frame e faz a localização
-        do rosto na imagem, retornando as coordenadas em vetor.'''
+        do rosto na imagem, retornando as coordenadas em vetor (bottom, left, top, right).'''
         face_locations = face_recognition.face_locations(frame)
         return face_locations
     
@@ -39,12 +37,11 @@ class FaceModel:
     #     ESTÁ SENDO USADA.'''
     #     for entry in encoded_faces: 
     #         label = entry['label']
-    #         stored_encode = entry['encoding'] 
+    #         stored_encode = [np.array(encoding) for encoding in entry['encoding']]
     #         matches = face_recognition.compare_faces([stored_encode], new_encoding, tolerance)
     #         if matches[0]:
     #             return label
     #     return None
-
 
     def calculate_face_distance(self, new_encoding, encoded_faces, threshold):
         '''Função responspavel por fazer o calculo de proximidade entre as faces
@@ -57,21 +54,16 @@ class FaceModel:
             label = entry['label']
             mail = entry['mail']
             stored_encode = [np.array(encoding) for encoding in entry['encoding']]
-            
-            print(f"Two hashes___________________________{stored_encode}")
-            
             distances = face_recognition.face_distance(stored_encode, new_encoding)
             
-            print(f"Distances____________________{distances}")
-            print(f"Threshold____________________{threshold}")
-            
-            if distances[0] < threshold and distances[1] < threshold:
-                print("Enters if_______________________")
-                
-                print(f"Both distances are a match for {label}, {mail}")
-                return label, mail, True
+            if len(distances) == 2:
+                if distances[0] < threshold and distances[1] < threshold:
+                    return label, mail, True
               
         return None, None, False
+    
+
+
     
 
         

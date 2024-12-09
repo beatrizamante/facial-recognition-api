@@ -1,6 +1,8 @@
-# .gitignore
-encoded_faces.json
-
-/encodes_test
-
 .env
+*.pyc
+*.pyo
+*.cert
+*.key
+dlib/
+.venv
+__pycache__
