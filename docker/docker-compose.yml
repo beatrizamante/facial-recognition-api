@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: 'reconhecimento-facial-api'
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: facial-recognition-api
+    command: python /app/main.py
+    ports:
+      - "443:443"  # Corrected port mapping
+    env_file: 
+      .env
+    volumes:
+      - .:/app  
+      - ./cert
+      - ./key
+   # Mount the key file
+    networks:
+      rede_local:
+        ipv4_address: 0.0.0.0
+    restart: on-failure
+
+networks:
+  rede_local:
+    name: "rede_local"
+    external: true

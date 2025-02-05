@@ -1,0 +1,8 @@
+.env
+*.pyc
+*.pyo
+*.cert
+*.key
+dlib/
+.venv
+__pycache__
