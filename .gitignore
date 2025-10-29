@@ -1,4 +1,5 @@
 .env
+.vscode
 *.pyc
 *.pyo
 *.cert
@@ -6,3 +7,6 @@
 dlib/
 .venv
 __pycache__
+__pycache__/
+*.py[cod]
+dlib

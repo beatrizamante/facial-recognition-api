@@ -1,2 +1,0 @@
-from app.controllers.face_controller_client import FaceController
-from app.controllers.face_controller_backend import FaceControllerJson
