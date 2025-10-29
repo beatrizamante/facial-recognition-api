@@ -1,7 +1,4 @@
-router = APIRouter()
-
-@router.post("/gerarEnconding", status_code=201, tags=["Generate encoding"])
-async def generate_enconding(
+def generate_enconding(
     file1: List[UploadFile] = File(...),
     file2: List[UploadFile] = File(...),
 ):
@@ -22,7 +19,7 @@ async def generate_enconding(
             encoded_binary = encode_to_base64(encodings[0])
             user_encodings.append(encoded_binary)
 
-        return {"hash1": user_encodings[0], "has2": user_encodings[1]}
+        return {"hash1": user_encodings[0], "hash2": user_encodings[1]}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
